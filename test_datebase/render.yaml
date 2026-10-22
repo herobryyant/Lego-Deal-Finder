@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: lego-deal-finder
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: EBAY_ENVIRONMENT
+        value: production
+      - key: EBAY_MARKETPLACE_ID
+        value: EBAY_US
+      - key: EBAY_CLIENT_ID
+        sync: false
+      - key: EBAY_CLIENT_SECRET
+        sync: false
+      - key: EBAY_DELETION_VERIFICATION_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false

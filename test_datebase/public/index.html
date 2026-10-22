@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <title>BrickScout — LEGO deal finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="BrickScout home"><span class="brand-mark">B</span><span>brick<span class="brand-bold">scout</span></span></a>
+    <div class="top-actions">
+      <div class="live-label"><span class="live-dot"></span> LIVE LISTINGS</div>
+      <button id="account-button" class="account-button" type="button">Sign in</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="spark">✳</span> THE HUNT STARTS HERE</div>
+        <h1>Find your next<br><span>great build.</span></h1>
+        <p class="intro">Search live LEGO listings and spot prices below the current market.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="brick brick-red"><i></i><i></i><i></i><i></i></div>
+        <div class="brick brick-yellow"><i></i><i></i><i></i><i></i></div>
+        <div class="brick brick-blue"><i></i><i></i><i></i><i></i></div>
+        <div class="mini-star">✳</div>
+      </div>
+    </section>
+
+    <section class="search-panel" aria-label="Search LEGO deals">
+      <div class="search-tabs" role="tablist" aria-label="Search by">
+        <button class="tab active" type="button" data-mode="name" role="tab" aria-selected="true">Set name</button>
+        <button class="tab" type="button" data-mode="number" role="tab" aria-selected="false">Set number</button>
+      </div>
+      <form id="search-form" class="search-form">
+        <label class="search-input-wrap" for="search-input"><span class="search-icon" aria-hidden="true">⌕</span><input id="search-input" name="q" autocomplete="off" placeholder="Try ‘Star Wars Millennium Falcon’" required><span class="input-hint" id="input-hint">Search any LEGO set</span></label>
+        <button class="search-button" type="submit"><span>Find deals</span><span aria-hidden="true">↗</span></button>
+      </form>
+      <div class="quick-searches"><span>Popular searches</span><button type="button" data-search="LEGO 75375 Millennium Falcon">75375 Millennium Falcon</button><button type="button" data-search="LEGO 10316 Rivendell">10316 Rivendell</button><button type="button" data-search="LEGO 21330 Home Alone">21330 Home Alone</button></div>
+    </section>
+
+    <section id="status-area" class="status-area" aria-live="polite"></section>
+
+    <section id="results-section" class="results-section" hidden>
+      <div class="results-heading">
+        <div><div class="eyebrow">YOUR SEARCH</div><h2 id="results-title">LEGO listings</h2><p id="results-subtitle"></p></div>
+        <label class="sort-control">Sort by <select id="sort-select"><option value="deal">Best deals</option><option value="price">Lowest total</option><option value="discount">Biggest discount</option></select></label>
+      </div>
+      <div class="market-note" id="market-note"></div>
+      <div id="results-grid" class="results-grid"></div>
+      <div class="results-footer" id="results-footer"></div>
+    </section>
+
+    <section id="empty-state" class="empty-state">
+      <div class="empty-icon">⌕</div><h2>What are you hunting for?</h2><p>Enter a set name or set number to compare current eBay listings.</p>
+    </section>
+
+    <section class="how-it-works">
+      <div class="eyebrow">A BETTER WAY TO BUILD</div>
+      <div class="how-grid">
+        <article><span class="step">01</span><h3>Search a set</h3><p>Use the LEGO name or its set number to find matching listings.</p></article>
+        <article><span class="step">02</span><h3>Compare fairly</h3><p>See each item’s price plus shipping alongside the current listing median.</p></article>
+        <article><span class="step">03</span><h3>Make your move</h3><p>Open the listing on eBay and check details before you buy.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>brickscout</span><span>Independent search tool · Listings and prices from eBay</span></footer>
+
+  <dialog id="auth-dialog" class="modal auth-modal">
+    <button class="modal-close" type="button" data-close-dialog aria-label="Close">×</button>
+    <div class="eyebrow">YOUR BRICKSCOUT ACCOUNT</div>
+    <h2 id="auth-title">Welcome back</h2>
+    <p class="modal-intro">Save deals, build watchlists, and keep your LEGO purchase history together.</p>
+    <div class="modal-tabs" role="tablist" aria-label="Account action">
+      <button class="modal-tab active" type="button" data-auth-mode="login">Sign in</button>
+      <button class="modal-tab" type="button" data-auth-mode="signup">Create account</button>
+    </div>
+    <form id="auth-form" class="stack-form">
+      <label id="display-name-field" hidden>Display name<input id="auth-display-name" autocomplete="name" maxlength="80"></label>
+      <label>Email<input id="auth-email" type="email" autocomplete="email" required maxlength="254"></label>
+      <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="8" maxlength="128"></label>
+      <p id="auth-message" class="form-message" aria-live="polite"></p>
+      <button class="primary-button" type="submit">Sign in</button>
+    </form>
+  </dialog>
+
+  <dialog id="account-dialog" class="modal account-modal">
+    <button class="modal-close" type="button" data-close-dialog aria-label="Close">×</button>
+    <div class="account-heading">
+      <div><div class="eyebrow">MY BRICKSCOUT</div><h2 id="account-name">My collection</h2><p id="account-email"></p></div>
+      <button id="logout-button" class="text-button" type="button">Sign out</button>
+    </div>
+    <nav class="account-tabs" aria-label="Account sections">
+      <button class="account-tab active" type="button" data-account-tab="profile">Profile</button>
+      <button class="account-tab" type="button" data-account-tab="saved">Saved deals <span id="saved-count">0</span></button>
+      <button class="account-tab" type="button" data-account-tab="watchlists">Watchlists <span id="watchlist-count">0</span></button>
+      <button class="account-tab" type="button" data-account-tab="transactions">Transactions <span id="transaction-count">0</span></button>
+    </nav>
+    <div id="account-loading" class="loading" hidden><div class="spinner"></div>Loading your account…</div>
+    <p id="account-message" class="form-message" aria-live="polite"></p>
+
+    <section class="account-panel active" data-account-panel="profile">
+      <form id="profile-form" class="stack-form two-column-form">
+        <label>Display name<input id="profile-display-name" maxlength="80"></label>
+        <label>Location<input id="profile-location" maxlength="120" placeholder="San Leandro, CA"></label>
+        <label>Favorite LEGO theme<input id="profile-theme" maxlength="80" placeholder="Star Wars"></label>
+        <div class="form-actions"><button class="primary-button" type="submit">Save profile</button></div>
+      </form>
+    </section>
+
+    <section class="account-panel" data-account-panel="saved">
+      <div id="saved-deals-list" class="data-list"></div>
+    </section>
+
+    <section class="account-panel" data-account-panel="watchlists">
+      <form id="watchlist-form" class="inline-data-form">
+        <label>Name<input id="watchlist-name" required maxlength="100" placeholder="UCS Star Wars"></label>
+        <label>Search terms<input id="watchlist-query" required maxlength="150" placeholder="LEGO UCS Millennium Falcon"></label>
+        <label>Set number<input id="watchlist-set" maxlength="30" placeholder="75192"></label>
+        <label>Max price ($)<input id="watchlist-price" type="number" min="0" step="0.01" placeholder="500"></label>
+        <button class="primary-button" type="submit">Add watchlist</button>
+      </form>
+      <div id="watchlists-list" class="data-list"></div>
+    </section>
+
+    <section class="account-panel" data-account-panel="transactions">
+      <form id="transaction-form" class="inline-data-form">
+        <label>LEGO set or item<input id="transaction-title" required maxlength="300" placeholder="75375 Millennium Falcon"></label>
+        <label>Amount ($)<input id="transaction-amount" type="number" min="0" step="0.01" required placeholder="69.99"></label>
+        <label>Status<select id="transaction-status"><option value="planned">Planned</option><option value="purchased">Purchased</option><option value="sold">Sold</option><option value="cancelled">Cancelled</option></select></label>
+        <label>Date<input id="transaction-date" type="date" required></label>
+        <label class="wide-field">Notes<input id="transaction-notes" maxlength="1000" placeholder="Optional condition, seller, or order note"></label>
+        <button class="primary-button" type="submit">Add transaction</button>
+      </form>
+      <div id="transactions-list" class="data-list"></div>
+    </section>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

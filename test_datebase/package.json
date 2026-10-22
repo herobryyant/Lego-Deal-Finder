@@ -1,0 +1,12 @@
+{
+  "name": "lego-deal-finder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A small LEGO deal finder powered by eBay Browse API",
+  "scripts": {
+    "start": "node server.js",
+    "check:ebay": "node server.js --check-ebay-auth",
+    "test": "node test/smoke.js"
+  },
+  "engines": { "node": ">=18" }
+}
