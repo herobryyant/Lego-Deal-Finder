@@ -3,6 +3,9 @@ services:
     name: lego-deal-finder
     runtime: docker
     plan: free
+    rootDir: test_database
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
