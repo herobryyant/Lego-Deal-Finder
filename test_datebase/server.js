@@ -204,7 +204,7 @@ async function getNotificationPublicKey(keyId) {
 async function verifyDeletionNotification(message, signatureHeader) {
   const signature = decodeNotificationSignature(signatureHeader);
   const publicKey = await getNotificationPublicKey(signature.kid);
-  const verifier = crypto.createVerify('sha256');
+  const verifier = crypto.createVerify('ssl3-sha1');
   verifier.update(JSON.stringify(message));
   verifier.end();
   return verifier.verify(publicKey, signature.signature, 'base64');
