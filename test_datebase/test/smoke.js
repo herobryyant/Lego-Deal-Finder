@@ -100,7 +100,7 @@ async function run() {
       data: { username: 'test-user', userId: 'test-user-id', eiasToken: 'test-token' },
     },
   };
-  const deletionSignature = crypto.sign('sha256', Buffer.from(JSON.stringify(deletionPayload)), privateKey).toString('base64');
+  const deletionSignature = crypto.sign('ssl3-sha1', Buffer.from(JSON.stringify(deletionPayload)), privateKey).toString('base64');
   const signatureHeader = Buffer.from(JSON.stringify({ kid: 'test-key', signature: deletionSignature })).toString('base64');
   const deletionResponse = await nativeFetch(`${origin}/api/ebay/account-deletion`, {
     method: 'POST',

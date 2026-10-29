@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "check:ebay": "node server.js --check-ebay-auth",
-    "test": "node test/smoke.js"
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node --test test/unit/*.test.js",
+    "test:integration": "node test/smoke.js"
   },
   "engines": { "node": ">=18" }
 }
