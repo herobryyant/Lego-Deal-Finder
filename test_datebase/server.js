@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { createSupabaseClient } = require('./lib/supabase');
+const { median, toListing } = require("./lib/deals");
 
 loadEnv();
 
