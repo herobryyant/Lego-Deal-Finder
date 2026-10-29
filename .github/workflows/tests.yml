@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: test_database
+        working-directory: test_datebase
 
     steps:
       - name: Check out repository
