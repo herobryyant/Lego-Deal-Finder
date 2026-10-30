@@ -11,6 +11,7 @@ process.env.EBAY_ENVIRONMENT = 'production';
 process.env.EBAY_CLIENT_ID = 'test-client-id';
 process.env.EBAY_CLIENT_SECRET = 'test-client-secret';
 process.env.RENDER_EXTERNAL_HOSTNAME = 'brickscout-test.example';
+process.env.EBAY_DELETION_ENDPOINT = 'https://brickscout-test.example/api/ebay/account-deletion';
 process.env.EBAY_DELETION_VERIFICATION_TOKEN = 'test_verification_token_1234567890';
 
 const { publicKey, privateKey } = crypto.generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
@@ -86,7 +87,7 @@ async function run() {
   const expectedChallenge = crypto.createHash('sha256')
     .update(challengeCode)
     .update(process.env.EBAY_DELETION_VERIFICATION_TOKEN)
-    .update(`https://${process.env.RENDER_EXTERNAL_HOSTNAME}/api/ebay/account-deletion`)
+    .update(process.env.EBAY_DELETION_ENDPOINT)
     .digest('hex');
   assert.equal(challenge.challengeResponse, expectedChallenge);
 

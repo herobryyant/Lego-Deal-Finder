@@ -7,12 +7,18 @@ const {
   toCandidate,
 } = require("../../scripts/check-price-alerts");
 
-function ebayItem({
-  id = "v1|123|0",
-  price = 50,
-  shipping = 5,
-  currency = "USD",
-} = {}) {
+function ebayItem(options = {}) {
+  const {
+    id = "v1|123|0",
+    price = 50,
+    currency = "USD",
+  } = options;
+
+  const shipping =
+    Object.hasOwn(options, "shipping")
+      ? options.shipping
+      : 5;
+
   return {
     itemId: id,
     title: `LEGO Set ${id}`,
