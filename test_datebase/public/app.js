@@ -210,6 +210,7 @@ function renderDashboard() {
   $('#profile-display-name').value = profile.display_name || '';
   $('#profile-location').value = profile.location || '';
   $('#profile-theme').value = profile.favorite_theme || '';
+  $('#profile-alert-email').value = profile.alert_email || session.user?.email || '';
   $('#account-name').textContent = profile.display_name || 'My collection';
   $('#saved-count').textContent = dashboard.savedDeals.length;
   $('#watchlist-count').textContent = dashboard.watchlists.length;
@@ -218,8 +219,120 @@ function renderDashboard() {
   $('#saved-deals-list').innerHTML = dashboard.savedDeals.length ? dashboard.savedDeals.map((deal) => `
     <article class="data-row"><div class="data-row-main"><h3>${escapeHtml(deal.title)}</h3><div class="data-row-meta"><span>${money((Number(deal.price_cents) + Number(deal.shipping_cents || 0)) / 100, deal.currency)}</span><span>${escapeHtml(deal.item_condition || 'Condition unavailable')}</span><span>Saved ${new Date(deal.saved_at).toLocaleDateString()}</span></div></div><div class="data-row-actions"><a class="small-button" href="${escapeHtml(deal.listing_url)}" target="_blank" rel="noopener noreferrer">View ↗</a><button class="small-button danger" type="button" data-delete-saved="${deal.id}">Remove</button></div></article>`).join('') : '<div class="data-empty">Save a listing from the search results and it will appear here.</div>';
 
-  $('#watchlists-list').innerHTML = dashboard.watchlists.length ? dashboard.watchlists.map((watchlist) => `
-    <article class="data-row"><div class="data-row-main"><h3>${escapeHtml(watchlist.name)}</h3><div class="data-row-meta"><span>${escapeHtml(watchlist.set_number || watchlist.search_query)}</span><span>${watchlist.max_price_cents == null ? 'Any price' : `Up to ${money(Number(watchlist.max_price_cents) / 100)}`}</span><span class="status-pill ${watchlist.active ? '' : 'cancelled'}">${watchlist.active ? 'Active' : 'Paused'}</span></div></div><div class="data-row-actions"><button class="small-button" type="button" data-run-watchlist="${watchlist.id}">Search</button><button class="small-button" type="button" data-toggle-watchlist="${watchlist.id}">${watchlist.active ? 'Pause' : 'Resume'}</button><button class="small-button danger" type="button" data-delete-watchlist="${watchlist.id}">Remove</button></div></article>`).join('') : '<div class="data-empty">Create a watchlist for a set or search you want to revisit.</div>';
+  $("#watchlists-list").innerHTML =
+  dashboard.watchlists.length
+    ? dashboard.watchlists
+        .map(
+          (watchlist) => `
+    <article class="data-row">
+      <div class="data-row-main">
+        <h3>${escapeHtml(watchlist.name)}</h3>
+
+        <div class="data-row-meta">
+          <span>
+            ${escapeHtml(
+              watchlist.set_number ||
+              watchlist.search_query
+            )}
+          </span>
+
+          <span>
+            ${
+              watchlist.max_price_cents == null
+                ? "No target price"
+                : `Up to ${money(
+                    Number(
+                      watchlist.max_price_cents
+                    ) / 100
+                  )}`
+            }
+          </span>
+
+          <span class="status-pill ${
+            watchlist.active
+              ? ""
+              : "cancelled"
+          }">
+            ${
+              watchlist.active
+                ? "Active"
+                : "Paused"
+            }
+          </span>
+
+          <span class="status-pill ${
+            watchlist.email_alerts
+              ? ""
+              : "cancelled"
+          }">
+            ${
+              watchlist.email_alerts
+                ? "Email alerts on"
+                : "Email alerts off"
+            }
+          </span>
+
+          ${
+            watchlist.last_checked_at
+              ? `<span>Checked ${new Date(
+                  watchlist.last_checked_at
+                ).toLocaleString()}</span>`
+              : ""
+          }
+        </div>
+      </div>
+
+      <div class="data-row-actions">
+        <button
+          class="small-button"
+          type="button"
+          data-run-watchlist="${watchlist.id}"
+        >
+          Search
+        </button>
+
+        <button
+          class="small-button"
+          type="button"
+          data-toggle-watchlist="${watchlist.id}"
+        >
+          ${
+            watchlist.active
+              ? "Pause"
+              : "Resume"
+          }
+        </button>
+
+        <button
+          class="small-button"
+          type="button"
+          data-toggle-email-alert="${watchlist.id}"
+        >
+          ${
+            watchlist.email_alerts
+              ? "Disable email"
+              : "Enable email"
+          }
+        </button>
+
+        <button
+          class="small-button danger"
+          type="button"
+          data-delete-watchlist="${watchlist.id}"
+        >
+          Remove
+        </button>
+      </div>
+    </article>
+  `
+        )
+        .join("")
+    : `
+      <div class="data-empty">
+        Create a watchlist and receive an email
+        when a listing reaches your target price.
+      </div>
+    `;
 
   $('#transactions-list').innerHTML = dashboard.transactions.length ? dashboard.transactions.map((transaction) => `
     <article class="data-row"><div class="data-row-main"><h3>${escapeHtml(transaction.title)}</h3><div class="data-row-meta"><span>${money(Number(transaction.amount_cents) / 100, transaction.currency)}</span><span>${new Date(`${transaction.occurred_at}T12:00:00`).toLocaleDateString()}</span>${transaction.notes ? `<span>${escapeHtml(transaction.notes)}</span>` : ''}</div></div><div class="data-row-actions"><select class="small-button" data-transaction-status="${transaction.id}" aria-label="Transaction status"><option value="planned" ${transaction.status === 'planned' ? 'selected' : ''}>Planned</option><option value="purchased" ${transaction.status === 'purchased' ? 'selected' : ''}>Purchased</option><option value="sold" ${transaction.status === 'sold' ? 'selected' : ''}>Sold</option><option value="cancelled" ${transaction.status === 'cancelled' ? 'selected' : ''}>Cancelled</option></select><button class="small-button danger" type="button" data-delete-transaction="${transaction.id}">Remove</button></div></article>`).join('') : '<div class="data-empty">Record planned purchases, purchases, or sales to build your history.</div>';
@@ -308,27 +421,86 @@ $$('[data-account-tab]').forEach((button) => button.addEventListener('click', ()
   $$('.account-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.accountPanel === button.dataset.accountTab));
 }));
 
-$('#profile-form').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  try {
-    const data = await api('/api/profile', { method: 'PUT', body: { displayName: $('#profile-display-name').value, location: $('#profile-location').value, favoriteTheme: $('#profile-theme').value } });
-    dashboard.profile = data.profile;
-    session.profile = data.profile;
-    renderDashboard();
-    updateAccountButton();
-    showToast('Profile updated.');
-  } catch (error) { setFormMessage('#account-message', error.message); }
-});
+$("#profile-form").addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
 
-$('#watchlist-form').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  try {
-    await api('/api/watchlists', { method: 'POST', body: { name: $('#watchlist-name').value, searchQuery: $('#watchlist-query').value, setNumber: $('#watchlist-set').value, maxPriceCents: dollarsToCents($('#watchlist-price').value) } });
-    event.currentTarget.reset();
-    await loadDashboardData(false);
-    showToast('Watchlist added.');
-  } catch (error) { setFormMessage('#account-message', error.message); }
-});
+    try {
+      const data = await api("/api/profile", {
+        method: "PUT",
+
+        body: {
+          displayName:
+            $("#profile-display-name").value,
+
+          location:
+            $("#profile-location").value,
+
+          favoriteTheme:
+            $("#profile-theme").value,
+
+          alertEmail:
+            $("#profile-alert-email").value,
+        },
+      });
+
+      dashboard.profile = data.profile;
+      session.profile = data.profile;
+
+      renderDashboard();
+      updateAccountButton();
+      showToast("Profile updated.");
+    } catch (error) {
+      setFormMessage(
+        "#account-message",
+        error.message
+      );
+    }
+  }
+);
+
+$("#watchlist-form").addEventListener(
+  "submit",
+  async (event) => {
+    event.preventDefault();
+
+    try {
+      await api("/api/watchlists", {
+        method: "POST",
+
+        body: {
+          name:
+            $("#watchlist-name").value,
+
+          searchQuery:
+            $("#watchlist-query").value,
+
+          setNumber:
+            $("#watchlist-set").value,
+
+          maxPriceCents: dollarsToCents(
+            $("#watchlist-price").value
+          ),
+
+          emailAlerts:
+            $("#watchlist-email-alerts").checked,
+        },
+      });
+
+      event.currentTarget.reset();
+      $("#watchlist-email-alerts").checked = true;
+
+      await loadDashboardData(false);
+      showToast("Watchlist added.");
+    } catch (error) {
+      setFormMessage(
+        "#account-message",
+        error.message
+      );
+    }
+  }
+);
 
 $('#transaction-form').addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -341,29 +513,119 @@ $('#transaction-form').addEventListener('submit', async (event) => {
   } catch (error) { setFormMessage('#account-message', error.message); }
 });
 
-accountDialog.addEventListener('click', async (event) => {
-  const savedButton = event.target.closest('[data-delete-saved]');
-  const watchDelete = event.target.closest('[data-delete-watchlist]');
-  const watchToggle = event.target.closest('[data-toggle-watchlist]');
-  const watchRun = event.target.closest('[data-run-watchlist]');
-  const transactionDelete = event.target.closest('[data-delete-transaction]');
-  try {
-    if (savedButton) await api(`/api/saved-deals/${savedButton.dataset.deleteSaved}`, { method: 'DELETE' });
-    else if (watchDelete) await api(`/api/watchlists/${watchDelete.dataset.deleteWatchlist}`, { method: 'DELETE' });
-    else if (watchToggle) {
-      const item = dashboard.watchlists.find((entry) => entry.id === watchToggle.dataset.toggleWatchlist);
-      await api(`/api/watchlists/${item.id}`, { method: 'PATCH', body: { active: !item.active } });
-    } else if (watchRun) {
-      const item = dashboard.watchlists.find((entry) => entry.id === watchRun.dataset.runWatchlist);
-      accountDialog.close();
-      setMode(item.set_number ? 'number' : 'name');
-      return runSearch(item.set_number || item.search_query);
-    } else if (transactionDelete) await api(`/api/transactions/${transactionDelete.dataset.deleteTransaction}`, { method: 'DELETE' });
-    else return;
-    await loadDashboardData(false);
-    if (latest) renderResults();
-  } catch (error) { setFormMessage('#account-message', error.message); }
-});
+accountDialog.addEventListener(
+  "click",
+  async (event) => {
+    const savedButton = event.target.closest(
+      "[data-delete-saved]"
+    );
+
+    const watchDelete = event.target.closest(
+      "[data-delete-watchlist]"
+    );
+
+    const watchToggle = event.target.closest(
+      "[data-toggle-watchlist]"
+    );
+
+    const emailToggle = event.target.closest(
+      "[data-toggle-email-alert]"
+    );
+
+    const watchRun = event.target.closest(
+      "[data-run-watchlist]"
+    );
+
+    const transactionDelete =
+      event.target.closest(
+        "[data-delete-transaction]"
+      );
+
+    try {
+      if (savedButton) {
+        await api(
+          `/api/saved-deals/${savedButton.dataset.deleteSaved}`,
+          { method: "DELETE" }
+        );
+      } else if (watchDelete) {
+        await api(
+          `/api/watchlists/${watchDelete.dataset.deleteWatchlist}`,
+          { method: "DELETE" }
+        );
+      } else if (watchToggle) {
+        const item = dashboard.watchlists.find(
+          (entry) =>
+            entry.id ===
+            watchToggle.dataset.toggleWatchlist
+        );
+
+        await api(
+          `/api/watchlists/${item.id}`,
+          {
+            method: "PATCH",
+            body: {
+              active: !item.active,
+            },
+          }
+        );
+      } else if (emailToggle) {
+        const item = dashboard.watchlists.find(
+          (entry) =>
+            entry.id ===
+            emailToggle.dataset.toggleEmailAlert
+        );
+
+        await api(
+          `/api/watchlists/${item.id}`,
+          {
+            method: "PATCH",
+            body: {
+              emailAlerts:
+                !item.email_alerts,
+            },
+          }
+        );
+      } else if (watchRun) {
+        const item = dashboard.watchlists.find(
+          (entry) =>
+            entry.id ===
+            watchRun.dataset.runWatchlist
+        );
+
+        accountDialog.close();
+
+        setMode(
+          item.set_number
+            ? "number"
+            : "name"
+        );
+
+        return runSearch(
+          item.set_number ||
+          item.search_query
+        );
+      } else if (transactionDelete) {
+        await api(
+          `/api/transactions/${transactionDelete.dataset.deleteTransaction}`,
+          { method: "DELETE" }
+        );
+      } else {
+        return;
+      }
+
+      await loadDashboardData(false);
+
+      if (latest) {
+        renderResults();
+      }
+    } catch (error) {
+      setFormMessage(
+        "#account-message",
+        error.message
+      );
+    }
+  }
+);
 
 accountDialog.addEventListener('change', async (event) => {
   const select = event.target.closest('[data-transaction-status]');
