@@ -1,0 +1,44 @@
+name: Price alerts
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "17 */6 * * *"
+
+concurrency:
+  group: lego-price-alerts
+  cancel-in-progress: false
+
+jobs:
+  check-price-alerts:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: test_datebase
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+
+      - name: Check watchlists
+        run: node scripts/check-price-alerts.js
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+
+          EBAY_ENVIRONMENT: production
+          EBAY_MARKETPLACE_ID: EBAY_US
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_FROM_EMAIL: ${{ secrets.ALERT_FROM_EMAIL }}
+
+          APP_URL: https://lego-deal-finder.onrender.com

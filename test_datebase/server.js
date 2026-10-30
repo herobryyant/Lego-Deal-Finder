@@ -373,20 +373,72 @@ async function handleUserData(req, res, url) {
 
   if (req.method === 'GET' && url.pathname === '/api/dashboard') return sendJson(res, 200, await dashboardFor(userId, token));
 
-  if (req.method === 'PUT' && url.pathname === '/api/profile') {
-    const body = await readJson(req);
-    const record = {
-      user_id: userId,
-      display_name: text(body.displayName, 80, 'Display name'),
-      location: text(body.location, 120, 'Location'),
-      favorite_theme: text(body.favoriteTheme, 80, 'Favorite theme'),
-    };
-    const rows = await restTable('profiles', token, {
-      method: 'POST', query: '?on_conflict=user_id', body: record,
-      prefer: 'resolution=merge-duplicates,return=representation',
-    });
-    return sendJson(res, 200, { profile: rows?.[0] || record });
+  if (
+  req.method === "PUT" &&
+  url.pathname === "/api/profile"
+) {
+  const body = await readJson(req);
+
+  const alertEmail = text(
+    body.alertEmail,
+    254,
+    "Alert email"
+  );
+
+  if (
+    alertEmail &&
+    !/^\S+@\S+\.\S+$/.test(alertEmail)
+  ) {
+    throw Object.assign(
+      new Error("Enter a valid alert email address."),
+      {
+        status: 400,
+        code: "VALIDATION_ERROR",
+      }
+    );
   }
+
+  const record = {
+    user_id: userId,
+
+    display_name: text(
+      body.displayName,
+      80,
+      "Display name"
+    ),
+
+    location: text(
+      body.location,
+      120,
+      "Location"
+    ),
+
+    favorite_theme: text(
+      body.favoriteTheme,
+      80,
+      "Favorite theme"
+    ),
+
+    alert_email:
+      alertEmail?.toLowerCase() || null,
+  };
+
+  const rows = await restTable(
+    "profiles",
+    token,
+    {
+      method: "POST",
+      query: "?on_conflict=user_id",
+      body: record,
+      prefer:
+        "resolution=merge-duplicates,return=representation",
+    }
+  );
+
+  return sendJson(res, 200, {
+    profile: rows?.[0] || record,
+  });
+}
 
   if (req.method === 'POST' && url.pathname === '/api/saved-deals') {
     const body = await readJson(req);
@@ -415,19 +467,60 @@ async function handleUserData(req, res, url) {
     return sendJson(res, 200, { ok: true });
   }
 
-  if (req.method === 'POST' && url.pathname === '/api/watchlists') {
-    const body = await readJson(req);
-    const record = {
-      user_id: userId,
-      name: text(body.name, 100, 'Watchlist name', true),
-      search_query: text(body.searchQuery, 150, 'Search query', true),
-      set_number: text(body.setNumber, 30, 'Set number'),
-      max_price_cents: cents(body.maxPriceCents, 'Maximum price'),
-      active: body.active !== false,
-    };
-    const rows = await restTable('watchlists', token, { method: 'POST', body: record, prefer: 'return=representation' });
-    return sendJson(res, 201, { watchlist: rows?.[0] });
-  }
+  if (
+  req.method === "POST" &&
+  url.pathname === "/api/watchlists"
+) {
+  const body = await readJson(req);
+
+  const record = {
+    user_id: userId,
+
+    name: text(
+      body.name,
+      100,
+      "Watchlist name",
+      true
+    ),
+
+    search_query: text(
+      body.searchQuery,
+      150,
+      "Search query",
+      true
+    ),
+
+    set_number: text(
+      body.setNumber,
+      30,
+      "Set number"
+    ),
+
+    max_price_cents: cents(
+      body.maxPriceCents,
+      "Maximum price",
+      true
+    ),
+
+    active: body.active !== false,
+    email_alerts: body.emailAlerts !== false,
+  };
+
+  const rows = await restTable(
+    "watchlists",
+    token,
+    {
+      method: "POST",
+      body: record,
+      prefer: "return=representation",
+    }
+  );
+
+  return sendJson(res, 201, {
+    watchlist: rows?.[0],
+  });
+}
+  
 
   const watchMatch = url.pathname.match(/^\/api\/watchlists\/([0-9a-f-]+)$/i);
   if (watchMatch && req.method === 'PATCH') {
@@ -438,6 +531,7 @@ async function handleUserData(req, res, url) {
     if ('setNumber' in body) changes.set_number = text(body.setNumber, 30, 'Set number');
     if ('maxPriceCents' in body) changes.max_price_cents = cents(body.maxPriceCents, 'Maximum price');
     if ('active' in body) changes.active = Boolean(body.active);
+    if ("emailAlerts" in body) {changes.email_alerts = Boolean(body.emailAlerts);} 
     const rows = await restTable('watchlists', token, { method: 'PATCH', query: `?id=eq.${encodeURIComponent(watchMatch[1])}`, body: changes, prefer: 'return=representation' });
     return sendJson(res, 200, { watchlist: rows?.[0] });
   }
