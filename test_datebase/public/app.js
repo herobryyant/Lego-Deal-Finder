@@ -61,6 +61,12 @@ function showToast(message) {
 
 function setFormMessage(selector, message = '', success = false) {
   const element = $(selector);
+
+  if (!element) {
+    console.error(`Missing message element: ${selector}`, message);
+    return;
+  }
+
   element.textContent = message;
   element.classList.toggle('success', success);
 }
@@ -460,53 +466,43 @@ $("#profile-form").addEventListener(
   }
 );
 
-$("#watchlist-form").addEventListener(
-  "submit",
-  async (event) => {
-    event.preventDefault();
 
-    try {
-      await api("/api/watchlists", {
-        method: "POST",
+const watchlistForm = $('#watchlist-form');
 
-        body: {
-          name:
-            $("#watchlist-name").value,
+watchlistForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-          searchQuery:
-            $("#watchlist-query").value,
+  const submittedForm = event.currentTarget;
 
-          setNumber:
-            $("#watchlist-set").value,
+  try {
+    await api('/api/watchlists', {
+      method: 'POST',
+      body: {
+        name: $('#watchlist-name').value.trim(),
+        searchQuery: $('#watchlist-query').value.trim(),
+        setNumber: $('#watchlist-set-number').value.trim(),
+        maxPriceCents: dollarsToCents(
+          $('#watchlist-max-price').value
+        ),
+        emailAlerts: $('#watchlist-email-alerts').checked,
+      },
+    });
 
-          maxPriceCents: dollarsToCents(
-            $("#watchlist-price").value
-          ),
-
-          emailAlerts:
-            $("#watchlist-email-alerts").checked,
-        },
-      });
-
-      event.currentTarget.reset();
-      $("#watchlist-email-alerts").checked = true;
-
-      await loadDashboardData(false);
-      showToast("Watchlist added.");
-    } catch (error) {
-      setFormMessage(
-        "#account-message",
-        error.message
-      );
-    }
+    submittedForm.reset();
+    await loadDashboardData(false);
+    showToast('Watchlist created.');
+  } catch (error) {
+    setFormMessage('#account-message', error.message);
   }
-);
+});
+
 
 $('#transaction-form').addEventListener('submit', async (event) => {
   event.preventDefault();
+  const submittedForm = event.currentTarget;
   try {
     await api('/api/transactions', { method: 'POST', body: { title: $('#transaction-title').value, amountCents: dollarsToCents($('#transaction-amount').value), status: $('#transaction-status').value, occurredAt: $('#transaction-date').value, notes: $('#transaction-notes').value, currency: 'USD' } });
-    event.currentTarget.reset();
+    submittedForm.reset();
     $('#transaction-date').value = localDateValue();
     await loadDashboardData(false);
     showToast('Transaction recorded.');
