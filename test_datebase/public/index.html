@@ -125,65 +125,13 @@
     </section>
 
     <section class="account-panel" data-account-panel="watchlists">
-      <form id="watchlist-form" class="inline-data-form">
-  <label>
-    Name
-    <input
-      id="watchlist-name"
-      name="name"
-      required
-      maxlength="100"
-      placeholder="UCS Star Wars"
-    >
-  </label>
-
-  <label>
-    Search terms
-    <input
-      id="watchlist-query"
-      name="search_query"
-      maxlength="150"
-      placeholder="LEGO UCS Millennium Falcon"
-    >
-  </label>
-
-  <label>
-    Set number
-    <input
-      id="watchlist-set-number"
-      name="set_number"
-      maxlength="30"
-      placeholder="75192"
-    >
-  </label>
-
-  <label>
-    Max alert price ($)
-    <input
-      id="watchlist-max-price"
-      name="max_price"
-      type="number"
-      min="0"
-      step="0.01"
-      required
-      placeholder="500"
-    >
-  </label>
-
-  <label class="checkbox-field wide-field">
-    <input
-      id="watchlist-email-alerts"
-      name="email_alerts"
-      type="checkbox"
-      checked
-    >
-    Send me an email when a listing reaches my target
-  </label>
-
-  <button class="primary-button" type="submit">
-    Add watchlist
-  </button>
-</form>
+      <form id="watchlist-form" class="inline-data-form"> <label> Name <input id="watchlist-name" required maxlength="100" placeholder="UCS Star Wars"> </label> <label> Search terms
+        <input id="watchlist-query" required maxlength="150" placeholder="LEGO UCS Millennium Falcon"> </label> <label> Set number
+        <input id="watchlist-set" maxlength="30" placeholder="75192"> </label> <label> Max alert price ($)
+        <input id="watchlist-price" type="number" min="0" step="0.01" required placeholder="500"> </label> <label class="checkbox-field wide-field">
+        <input id="watchlist-email-alerts" type="checkbox" checked> Send me an email when a listing reaches my target </label>
+        <button class="primary-button" type="submit"> Add watchlist </button>
+      </form>
       <div id="watchlists-list" class="data-list"></div>
     </section>
 
