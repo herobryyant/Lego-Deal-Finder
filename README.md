@@ -5,7 +5,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-3ECF8E?logo=supabase&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 
-BrickScout is a full-stack LEGO deal-finding application that searches live eBay listings, compares shipping-inclusive prices, and notifies users when a watched set reaches their target price.
+BrickScout is a full-stack LEGO deal finding application that searches live eBay listings, compares shipping-inclusive prices, and notifies users when a watched set reaches their target price.
 
 [View the live demo](https://lego-deal-finder.onrender.com)
 
@@ -21,7 +21,7 @@ BrickScout is a full-stack LEGO deal-finding application that searches live eBay
 - Identify listings priced below the current median
 - Create and authenticate user accounts
 - Save interesting listings
-- Create price-target watchlists
+- Create price target watchlists
 - Enable or pause individual email alerts
 - Receive automated deal notifications through Resend
 - Track planned purchases, purchases, and sales
@@ -61,7 +61,7 @@ flowchart TD
 
 1. A user creates a watchlist with a search term, optional set number, and target price.
 2. Supabase stores the watchlist and the user’s notification preferences.
-3. GitHub Actions runs the price-alert worker on a schedule.
+3. GitHub Actions runs the price alert worker on a schedule.
 4. The worker retrieves active watchlists and searches the eBay Browse API.
 5. Shipping-inclusive totals are compared against each target price.
 6. Resend sends an email when a qualifying listing is found.
@@ -74,7 +74,7 @@ flowchart TD
 - HTML5
 - CSS3
 - Vanilla JavaScript
-- Responsive dialog-based account dashboard
+- Responsive dialog based account dashboard
 
 ### Backend
 
@@ -94,7 +94,7 @@ flowchart TD
 - Docker
 - Render
 - GitHub Actions
-- Scheduled price-alert worker
+- Scheduled price alert worker
 - Unit and integration tests
 
 ## Local Setup
@@ -202,7 +202,7 @@ Run the integration smoke test:
 npm run test:integration
 ```
 
-Manually run the price-alert worker:
+Manually run the price alert worker:
 
 ```bash
 node scripts/check-price-alerts.js
