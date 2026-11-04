@@ -5,7 +5,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-3ECF8E?logo=supabase&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
 
-BrickScout is a full-stack LEGO deal finding application that searches live eBay listings, compares shipping-inclusive prices, and notifies users when a watched set reaches their target price.
+BrickScout is a full stack LEGO deal finding application that searches live eBay listings, compares shipping inclusive prices, and notifies users when a watched set reaches their target price.
 
 [View the live demo](https://lego-deal-finder.onrender.com)
 
@@ -63,7 +63,7 @@ flowchart TD
 2. Supabase stores the watchlist and the user’s notification preferences.
 3. GitHub Actions runs the price alert worker on a schedule.
 4. The worker retrieves active watchlists and searches the eBay Browse API.
-5. Shipping-inclusive totals are compared against each target price.
+5. Shipping inclusive totals are compared against each target price.
 6. Resend sends an email when a qualifying listing is found.
 7. The alert is recorded in PostgreSQL to prevent duplicate notifications.
 
@@ -232,9 +232,9 @@ http://localhost:3000
 
 The scheduled GitHub Actions workflow:
 
-1. Loads active email-enabled watchlists.
+1. Loads active email enabled watchlists.
 2. Searches eBay for matching listings.
-3. Rejects listings with unknown shipping or non-USD prices.
+3. Rejects listings with unknown shipping or non USD prices.
 4. Selects the least expensive listing under the target price.
 5. Sends the user an email through Resend.
 6. Records the alert to prevent duplicate notifications.
@@ -272,11 +272,11 @@ ALERT_FROM_EMAIL
 ## Security
 
 - Secrets are stored in environment variables and GitHub Actions Secrets.
-- User-owned database rows are protected with PostgreSQL Row-Level Security.
+- User owned database rows are protected with PostgreSQL Row-Level Security.
 - The Supabase secret key is restricted to trusted backend workers.
 - Authentication cookies can be configured as secure in production.
 - eBay deletion notifications are verified before processing.
-- User-provided content is escaped before being rendered.
+- User provided content is escaped before being rendered.
 
 ## Future Improvements
 
