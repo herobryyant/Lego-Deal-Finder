@@ -11,7 +11,7 @@ BrickScout is a full-stack LEGO deal-finding application that searches live eBay
 
 > The Render free service may take a short time to wake up on the first request.
 
-![BrickScout homepage](docs/screenshots/home.png)
+![BrickScout homepage](test_datebase/docs/screenshots/home.png)
 
 ## Features
 
@@ -33,15 +33,15 @@ BrickScout is a full-stack LEGO deal-finding application that searches live eBay
 
 ### Search and compare listings
 
-![Search results](docs/screenshots/search-results.png)
+![Search results](test_datebase/docs/screenshots/search-results.png)
 
 ### Manage price watchlists
 
-![Watchlist dashboard](docs/screenshots/watchlists.png)
+![Watchlist dashboard](test_datebase/docs/screenshots/watchlists.png)
 
 ### Receive automated alerts
 
-![Price alert email](docs/screenshots/price-alert-email.png)
+![Price alert email](test_datebase/docs/screenshots/price-alert-email.png)
 
 ## Architecture
 
